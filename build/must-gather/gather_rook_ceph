@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Resource List
+resources=()
+
+# Operator Resources
+resources+=(clusteroperators)
+
+# Certificate Resources
+resources+=(certificatesigningrequests)
+
+# Machine/Node Resources
+resources+=(nodes machines machineconfigs machineconfigpools)
+
+# Namespaces/Project Resources
+resources+=(ns/default ns/openshift ns/kube-system ns/rook-ceph)
+
+# Storage Resources
+resources+=(storageclasses persistentvolumes volumeattachments)
+
+# Networking Resources
+resources+=(clusternetworks hostsubnets)
+
+# Autoscaler Resources
+resources+=(clusterautoscaler machineautoscaler)
+
+# Run the Collection of Resources using must-gather
+for resource in ${resources[@]}; do
+    /usr/bin/openshift-must-gather --base-dir=/tmp inspect ${resource}
+done
+
+# Collect System Audit Logs
+/usr/bin/gather_audit_logs
+
+# Gather Service Logs (using a suplamental Script); Scoped to Masters.
+/usr/bin/gather_service_logs master
